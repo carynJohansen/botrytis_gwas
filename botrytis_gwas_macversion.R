@@ -69,7 +69,7 @@ snps.all <- cbind(snps.all[,c(1:3)], snps.Z)
 # Test of the Variance
 # for each of the genes
 
-exp.variance <- data.frame(gene = as.character(), gene.var = as.numeric())
+exp.variance <- data.frame()
 
 for (j in 1:dim(exp.coi.1)[2]) {
   gene.var <- cbind(colnames(exp.coi.1)[j], var(exp.coi.1[,j]))
