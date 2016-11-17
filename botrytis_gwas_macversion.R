@@ -165,10 +165,10 @@ for (j in 1:dim(exp.coi.1)[2]) {
   #                     tol.err = 1e-06,
   #                     tol.conv = 1e-08,
   #                     GPU = FALSE)
-      #updates the obtained bigRR object into a new object with heteroscedastic assumptions
-      #meaning that the variability of a variable is unequal acress the range of values of the variable
-      # that is being used to predict it. (here, the variability of expression 
-      # data for a gene would be unequal across the SNP values)
+  #updates the obtained bigRR object into a new object with heteroscedastic assumptions
+  #meaning that the variability of a variable is unequal acress the range of values of the variable
+  # that is being used to predict it. (here, the variability of expression 
+  # data for a gene would be unequal across the SNP values)
   HEM.result <- try(bigRR_update(BLUP.result, t(snps.chrom1.mat)), TRUE)
       
   #capture results
@@ -177,8 +177,8 @@ for (j in 1:dim(exp.coi.1)[2]) {
   coi.output.HEM <- cbind(coi.output.HEM, HEM.result$u)
   colnames(coi.output.HEM) <- c(colnames(coi.output.HEM[1:(j-1+2)]), gene)
 }
-  
-# There are instances where convergence for the ridge regression does not occur.
+
+#There are instances where convergence for the ridge regression does not occur.
 
 ###############
 # Ploting

@@ -6,20 +6,20 @@
 ##########
 # Set Up
 
-setwd("~/Botrytis")
-sink("bot_bigRR_allSNPS_11142016.txt")
+setwd("~/Dropbox/UCD/rotations/Kliebenstein/botrytis_gwas")
+#sink("bot_bigRR_allSNPS_11142016.txt")
 library(bigRR)
+
+data.path <- "~/Box Sync/Botrytis_DKrotation/data/"
 
 ##########
 # Data
 
-snps.all <- read.csv("data/binSNP_bigRR_MAF20hp/binSNP_bigRR_MAF20hp.csv", 
-                    header=T, sep=",", row.names=1, check.names = FALSE)
+snps.all <- read.csv(paste(data.path, "binSNP_bigRR_MAF20hp/binSNP_bigRR_MAF20hp.csv", sep=""), 
+                     header=T, sep=",", row.names=1, check.names = FALSE)
 #make the chromosome position a facotr
 snps.all$POS <- as.factor(as.character(snps.all$POS))
-expression.y <- read.table("data/result.lsm.csv", header=T, sep=",", row.names = 1)
-#make the Isolate a factor
-expression.y$Isolate <- as.character(expression.y$Isolate)
+expression.y <- read.table(paste(data.path, "result.lsm.csv", sep=""), header=T, sep=",", row.names = 1)
 
 #subset the snp.Z to only have SNP information
 #snp.Z <- snps.all[,4:96]
@@ -31,7 +31,8 @@ expression.y$Isolate <- as.character(expression.y$Isolate)
 
 library(xlsx)
 
-supp <- read.xlsx("data/FinalSupplemental-3.xlsx", sheetIndex = 1)
+#supp <- read.xlsx("data/FinalSupplemental-3.xlsx", sheetIndex = 1)
+supp <- read.table(paste(data.path, "FinalSupplemental-3.txt", sep=""), sep="\t", header=T)
 supp$Name <- as.character(supp$Name)
 
 snps.iso <- colnames(snps.all)[-c(1:3)]
@@ -133,7 +134,6 @@ bigRR_update_function <- function(blup.result, shrink.param.design) {
 snp.Z.mat <- as.matrix(snp.Z)
 dim(snp.Z.mat)
 
-
 ###################
 #Coi.1
   
@@ -148,66 +148,123 @@ coi.output.HEM <- snps.all[,c(1,2)]
 
 #outdir <- "~/Botrytis"
 
-for (j in 1:dim(exp.coi.1)[2]) {
-  #j is the expression data for each gene across all tested conditions
-  print(j)
-  print(colnames(exp.coi.1)[j])
-  gene <- colnames(exp.coi.1)[j]
+strt <- 1
+
+#do gwas analysis in chunks, to not fill the R memory environment
+for (p in 1:2) {
+  print(p)
+  stp <- (p*10)/2
+  print(stp)
+  #create numberic vector for columns for the chunk
+  chunk <- c(strt:stp)
+  print(chunk)
   
-  #print the variance
-  print("Expression variance")
-  print(var(exp.coi.1[,j]))
+  #subset the larger expression data set by that chunk
+  exp.chunk <- exp.coi.1[,chunk]
+  print(dim(exp.chunk))
+ 
+  #create lists to store the output
+  chunk.list.BLUP <- list()
+  chunk.list.HEM <- list()
   
-  #make the design matrix
-  j.X <- matrix(1, dim(exp.coi.1)[1], 1)
-  
-  #fit the ridge regression
-  BLUP.result <- try(bigRR_function(exp.coi.1[,j], j.X, t(snp.Z.mat)), TRUE)
-  if (class(BLUP.result) == "try-error") {
-    print(paste(colnames(exp.coi.1)[j], "at j =", j, "encountered an error in bigRR() and was skipped"))
-    print("ERROR MESSAGE:")
-    print(BLUP.result)
+  #loop through expression subset by the genes and run bigRR
+  for (j in 1:dim(exp.chunk)[2]) {
+    #j is the expression data for each gene across all tested conditions
+    print(j)
+    print(colnames(exp.chunk)[j])
+    gene <- colnames(exp.chunk)[j]
+    print(gene)
+    #print the variance
+    print("Expression variance")
+    print(var(exp.chunk[,j]))
     
-    #add column of NAs to hold this j
-    coi.output.BLUP <- cbind(coi.output.BLUP, rep(9999, nrow(coi.output.BLUP)))
-    colnames(coi.output.BLUP) <- c(colnames(coi.output.BLUP[1:(j+1)]), paste(gene, "FAIL", sep="_"))
-    #add column of NAs to hold this j in HEM.results
-    coi.output.HEM <- cbind(coi.output.HEM, rep(9999, nrow(coi.output.HEM)))
-    colnames(coi.output.HEM) <- c(colnames(coi.output.HEM[1:(j+1)]), paste(gene, "FAIL", sep="_"))
+    #make the design matrix
+    j.X <- matrix(1, dim(exp.chunk)[1], 1)
     
-    #go to next iteration
-    next
+    #fit the ridge regression
+    BLUP.result <- try(bigRR_function(exp.chunk[,j], j.X, t(snp.Z.mat)), TRUE)
+    if (class(BLUP.result) == "try-error") {
+      print(paste(colnames(exp.chunk)[j], "at j =", j, "encountered an error in bigRR() and was skipped"))
+      print("ERROR MESSAGE:")
+      print(BLUP.result)
+      
+      #add to chunk list
+      chunk.list.BLUP[[gene]] <- rep(9999, nrow(snp.Z.mat))
+      colnames(chunk.list.BLUP[[gene]]) <- gene
+      chunk.list.HEM[[gene]] <- HEM.result$u
+      colnames(chunk.list.HEM[[gene]]) <- rep(9999, nrow(snp.Z.mat))
+      
+      #keep this for testing...
+      coi.output.BLUP <- cbind(coi.output.BLUP, rep(9999, nrow(coi.output.BLUP)))
+      colnames(coi.output.BLUP) <- c(colnames(coi.output.BLUP[1:(j+1)]), paste(gene, "FAIL", sep="_"))
+      #add column of NAs to hold this j in HEM.results
+      coi.output.HEM <- cbind(coi.output.HEM, rep(9999, nrow(coi.output.HEM)))
+      colnames(coi.output.HEM) <- c(colnames(coi.output.HEM[1:(j+1)]), paste(gene, "FAIL", sep="_"))
+      
+      #go to next iteration
+      next
+    }
+    
+    #BLUP.result <- bigRR(y = exp.chunk[,j], X=j.X, Z=t(snps.chrom1.mat), 
+    #                     family = gaussian(link="identity"), #poisson for RNA expression data
+    #                     tol.err = 1e-06,
+    #                     tol.conv = 1e-08,
+    #                     GPU = FALSE)
+    #updates the obtained bigRR object into a new object with heteroscedastic assumptions
+    #meaning that the variability of a variable is unequal acress the range of values of the variable
+    # that is being used to predict it. (here, the variability of expression 
+    # data for a gene would be unequal across the SNP values)
+    HEM.result <- try(bigRR_update(BLUP.result, t(snp.Z.mat)), TRUE)
+    if (class(HEM.result) == "try-error") {
+      print(paste(colnames(exp.chunk)[j], "at j =", j, "encountered an error in bigRR_update() and was skipped"))
+      print("ERROR MESSAGE:")
+      print(HEM.result)
+      
+      #add to chunk list
+      chunk.list.BLUP[[gene]] <- BLUP.result$u
+      colnames(chunk.list.BLUP[[gene]]) <- gene
+      chunk.list.HEM[[gene]] <- rep(9999, nrow(coi.output.HEM))
+      
+      #add column of NAs to hold this j
+      coi.output.HEM <- cbind(coi.output.HEM, rep(9999, nrow(coi.output.HEM)))
+      colnames(coi.output.HEM) <- c(colnames(coi.output.HEM[1:(j+1)]), paste(gene, "FAIL", sep="_"))
+      
+      #go to next iteration
+      next
+    }
+    
+    #if it makes it through bigRR() and bigRR_update() without any error, store the data
+    chunk.list.BLUP[[gene]] <- BLUP.result$u
+    colnames(chunk.list.BLUP[[gene]]) <- gene
+    chunk.list.HEM[[gene]] <- HEM.result$u
+    colnames(chunk.list.HEM[[gene]]) <- gene
+        
+    #capture results
+    coi.output.BLUP <- cbind(coi.output.BLUP, BLUP.result$u)
+    colnames(coi.output.BLUP) <- c(colnames(coi.output.BLUP[1:(j+1)]), gene)
+    coi.output.HEM <- cbind(coi.output.HEM, HEM.result$u)
+    colnames(coi.output.HEM) <- c(colnames(coi.output.HEM[1:(j+1)]), gene)
   }
   
-  #BLUP.result <- bigRR(y = exp.coi.1[,j], X=j.X, Z=t(snps.chrom1.mat), 
-  #                     family = gaussian(link="identity"), #poisson for RNA expression data
-  #                     tol.err = 1e-06,
-  #                     tol.conv = 1e-08,
-  #                     GPU = FALSE)
-  #updates the obtained bigRR object into a new object with heteroscedastic assumptions
-  #meaning that the variability of a variable is unequal acress the range of values of the variable
-  # that is being used to predict it. (here, the variability of expression 
-  # data for a gene would be unequal across the SNP values)
-  HEM.result <- try(bigRR_update(BLUP.result, t(snp.Z.mat)), TRUE)
-  if (class(HEM.result) == "try-error") {
-    print(paste(colnames(exp.coi.1)[j], "at j =", j, "encountered an error in bigRR_update() and was skipped"))
-    print("ERROR MESSAGE:")
-    print(HEM.result)
-    
-    #add column of NAs to hold this j
-    coi.output.HEM <- cbind(coi.output.HEM, rep(9999, nrow(coi.output.HEM)))
-    colnames(coi.output.HEM) <- c(colnames(coi.output.HEM[1:(j+1)]), paste(gene, "FAIL", sep="_"))
-    
-    #go to next iteration
-    next
-  }
+  #After the loop, form list into data frame
+  BLUP.results.df <- do.call(cbind, chunk.list.BLUP)
+  dim(BLUP.results.df)
   
-  #capture results
-  coi.output.BLUP <- cbind(coi.output.BLUP, BLUP.result$u)
-  colnames(coi.output.BLUP) <- c(colnames(coi.output.BLUP[1:(j+1)]), gene)
-  coi.output.HEM <- cbind(coi.output.HEM, HEM.result$u)
-  colnames(coi.output.HEM) <- c(colnames(coi.output.HEM[1:(j+1)]), gene)
+  HEM.results.df <- do.call(cbind, chunk.list.HEM)
+  dim(BLUP.results.df)
+  
+  #and append to a file
+  write.table(t(BLUP.results.df), file="coi_BLUP_results_appendTest.csv", sep=",", quote=FALSE, row.names = FALSE, append =TRUE)
+  write.table(t(HEM.results.df), file="coi_HEM_results_appendTest.csv", sep=",", quote=FALSE, row.names = FALSE, append =TRUE)
+  
+  #update start
+  strt <- stp+1
+  print(strt)
 }
+
+list.test.blup <- read.table("coi_BLUP_results_appendTest.csv", sep=",")
+
+list.test.hem <- read.table("coi_HEM_results_appendTest.csv")
 
 write.table(coi.output.BLUP, file="coi_BLUP_results.csv", sep=",", quote = FALSE, row.names = FALSE)
 write.table(coi.output.HEM, file="coi_HEM_results.csv", sep=",", quote = FALSE, row.names =FALSE)
