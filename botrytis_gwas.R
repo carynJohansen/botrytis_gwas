@@ -150,10 +150,22 @@ coi.output.HEM <- snps.all[,c(1,2)]
 
 strt <- 1
 
+write.table(t(snps.all[,c(1,2)]), file="coi_BLUP_results_appendTest.csv", sep=",",
+            quote=FALSE, row.names = TRUE, col.names = FALSE, append =TRUE)
+write.table(t(snps.all[,c(1,2)]), file="coi_HEM_results.csv", sep=",", 
+            quote = FALSE, row.names =TRUE, col.names=FALSE, append=TRUE)
+
+
+
 #do gwas analysis in chunks, to not fill the R memory environment
-for (p in 1:2) {
+for (p in 1:18) {
   print(p)
-  stp <- (p*10)/2
+  #iterate through the trait data in chunks of 500
+  # the reason for this is, the first time we ran it, it maxed out the memory after 705
+  # iterations. I want to stay well below that.
+  #This is not going to get all of the Botrytis genes. There are 9267. We'll have to add
+  # the 267 genes later because I don't know how to to iteratively set an odd number in this chunk fashion.
+  stp <- p*500
   print(stp)
   #create numberic vector for columns for the chunk
   chunk <- c(strt:stp)
@@ -191,15 +203,8 @@ for (p in 1:2) {
       #add to chunk list
       chunk.list.BLUP[[gene]] <- rep(9999, nrow(snp.Z.mat))
       colnames(chunk.list.BLUP[[gene]]) <- gene
-      chunk.list.HEM[[gene]] <- HEM.result$u
-      colnames(chunk.list.HEM[[gene]]) <- rep(9999, nrow(snp.Z.mat))
-      
-      #keep this for testing...
-      coi.output.BLUP <- cbind(coi.output.BLUP, rep(9999, nrow(coi.output.BLUP)))
-      colnames(coi.output.BLUP) <- c(colnames(coi.output.BLUP[1:(j+1)]), paste(gene, "FAIL", sep="_"))
-      #add column of NAs to hold this j in HEM.results
-      coi.output.HEM <- cbind(coi.output.HEM, rep(9999, nrow(coi.output.HEM)))
-      colnames(coi.output.HEM) <- c(colnames(coi.output.HEM[1:(j+1)]), paste(gene, "FAIL", sep="_"))
+      chunk.list.HEM[[gene]] <- rep(9999, nrow(snp.Z.mat))
+      colnames(chunk.list.HEM[[gene]]) <- gene
       
       #go to next iteration
       next
@@ -225,10 +230,6 @@ for (p in 1:2) {
       colnames(chunk.list.BLUP[[gene]]) <- gene
       chunk.list.HEM[[gene]] <- rep(9999, nrow(coi.output.HEM))
       
-      #add column of NAs to hold this j
-      coi.output.HEM <- cbind(coi.output.HEM, rep(9999, nrow(coi.output.HEM)))
-      colnames(coi.output.HEM) <- c(colnames(coi.output.HEM[1:(j+1)]), paste(gene, "FAIL", sep="_"))
-      
       #go to next iteration
       next
     }
@@ -238,12 +239,6 @@ for (p in 1:2) {
     colnames(chunk.list.BLUP[[gene]]) <- gene
     chunk.list.HEM[[gene]] <- HEM.result$u
     colnames(chunk.list.HEM[[gene]]) <- gene
-        
-    #capture results
-    coi.output.BLUP <- cbind(coi.output.BLUP, BLUP.result$u)
-    colnames(coi.output.BLUP) <- c(colnames(coi.output.BLUP[1:(j+1)]), gene)
-    coi.output.HEM <- cbind(coi.output.HEM, HEM.result$u)
-    colnames(coi.output.HEM) <- c(colnames(coi.output.HEM[1:(j+1)]), gene)
   }
   
   #After the loop, form list into data frame
@@ -254,7 +249,8 @@ for (p in 1:2) {
   dim(BLUP.results.df)
   
   #and append to a file
-  write.table(t(BLUP.results.df), file="coi_BLUP_results_appendTest.csv", sep=",", quote=FALSE, row.names = FALSE, append =TRUE)
+  write.table(t(BLUP.results.df), file="coi_BLUP_results_appendTest.csv", sep=",",
+              quote=FALSE, row.names = TRUE, col.names = FALSE, append =TRUE)
   write.table(t(HEM.results.df), file="coi_HEM_results_appendTest.csv", sep=",", quote=FALSE, row.names = FALSE, append =TRUE)
   
   #update start
