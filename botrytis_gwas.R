@@ -155,8 +155,6 @@ write.table(t(snps.all[,c(1,2)]), file="coi_BLUP_results_appendTest.csv", sep=",
 write.table(t(snps.all[,c(1,2)]), file="coi_HEM_results.csv", sep=",", 
             quote = FALSE, row.names =TRUE, col.names=FALSE, append=TRUE)
 
-
-
 #do gwas analysis in chunks, to not fill the R memory environment
 for (p in 1:18) {
   print(p)
@@ -165,7 +163,8 @@ for (p in 1:18) {
   # iterations. I want to stay well below that.
   #This is not going to get all of the Botrytis genes. There are 9267. We'll have to add
   # the 267 genes later because I don't know how to to iteratively set an odd number in this chunk fashion.
-  stp <- p*500
+  #stp <- p*500
+  stp <- (p*10)/2
   print(stp)
   #create numberic vector for columns for the chunk
   chunk <- c(strt:stp)
@@ -201,10 +200,10 @@ for (p in 1:18) {
       print(BLUP.result)
       
       #add to chunk list
-      chunk.list.BLUP[[gene]] <- rep(9999, nrow(snp.Z.mat))
-      colnames(chunk.list.BLUP[[gene]]) <- gene
-      chunk.list.HEM[[gene]] <- rep(9999, nrow(snp.Z.mat))
-      colnames(chunk.list.HEM[[gene]]) <- gene
+      chunk.list.BLUP[[gene]] <- as.matrix(rep(9999, nrow(snp.Z.mat)))
+      colnames(chunk.list.BLUP[[gene]]) <- paste(gene, "FAIL", sep="_")
+      chunk.list.HEM[[gene]] <- as.matrix(rep(9999, nrow(snp.Z.mat)))
+      colnames(chunk.list.HEM[[gene]]) <- paste(gene, "FAIL", sep="_")
       
       #go to next iteration
       next
@@ -226,9 +225,12 @@ for (p in 1:18) {
       print(HEM.result)
       
       #add to chunk list
+      #add the BLUP result, which was not an error at this point
       chunk.list.BLUP[[gene]] <- BLUP.result$u
       colnames(chunk.list.BLUP[[gene]]) <- gene
-      chunk.list.HEM[[gene]] <- rep(9999, nrow(coi.output.HEM))
+      #add the filler for the gene
+      chunk.list.HEM[[gene]] <- as.matrix(rep(9999, nrow(coi.output.HEM)))
+      colnames(chunk.list.HEM[[gene]]) <- paste(gene, "FAIL", sep="_")
       
       #go to next iteration
       next
@@ -251,7 +253,8 @@ for (p in 1:18) {
   #and append to a file
   write.table(t(BLUP.results.df), file="coi_BLUP_results_appendTest.csv", sep=",",
               quote=FALSE, row.names = TRUE, col.names = FALSE, append =TRUE)
-  write.table(t(HEM.results.df), file="coi_HEM_results_appendTest.csv", sep=",", quote=FALSE, row.names = FALSE, append =TRUE)
+  write.table(t(HEM.results.df), file="coi_HEM_results_appendTest.csv", sep=",", 
+              quote=FALSE, row.names = TRUE, col.names = FALSE, append =TRUE)
   
   #update start
   strt <- stp+1
