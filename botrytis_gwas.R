@@ -163,8 +163,8 @@ for (p in 1:18) {
   # iterations. I want to stay well below that.
   #This is not going to get all of the Botrytis genes. There are 9267. We'll have to add
   # the 267 genes later because I don't know how to to iteratively set an odd number in this chunk fashion.
-  #stp <- p*500
-  stp <- (p*10)/2
+  stp <- p*500
+  #stp <- (p*10)/2
   print(stp)
   #create numberic vector for columns for the chunk
   chunk <- c(strt:stp)
