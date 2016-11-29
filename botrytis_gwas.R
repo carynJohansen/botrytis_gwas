@@ -7,7 +7,7 @@
 # Set Up
 
 setwd("~/Dropbox/UCD/rotations/Kliebenstein/botrytis_gwas")
-#sink("bot_bigRR_allSNPS_11142016.txt")
+sink("bot_bigRR_allSNPS_11282016.txt")
 library(bigRR)
 
 data.path <- "~/Box Sync/Botrytis_DKrotation/data/"
@@ -29,7 +29,7 @@ expression.y <- read.table(paste(data.path, "result.lsm.csv", sep=""), header=T,
 #there's a discrepency in the data - there are a few more isolates in the expression data than
 # there are in the SNP data set
 
-library(xlsx)
+#library(xlsx)
 
 #supp <- read.xlsx("data/FinalSupplemental-3.xlsx", sheetIndex = 1)
 supp <- read.table(paste(data.path, "FinalSupplemental-3.txt", sep=""), sep="\t", header=T)
@@ -123,6 +123,33 @@ bigRR_update_function <- function(blup.result, shrink.param.design) {
 
 ####################
 
+#Random Sample of genes
+
+random.genes <- sample(length(exp.coi.1), 100, replace=FALSE)
+#add one and two
+random.genes <- c(1,2,random.genes)
+#order it?
+random.genes <- random.genes[order(random.genes)]
+
+exp.100 <- expression.y[,random.genes]
+
+#check the order of this....
+#expected dimension....
+
+exp.coi1.100 <- as.data.frame(exp.100[exp.100$HostGenotype == "coi.1",])
+exp.coi1.100 <- as.data.frame(exp.coi1.100[exp.coi1.100$Isolate %in% iso.index.keep,])
+exp.coi1.100 <- exp.coi1.100[,-c(1:2)]
+
+exp.col0.100 <- exp.100[exp.100$HostGenotype == "col.0",]
+exp.col0.100 <- exp.col0.100[exp.col0.100$Isolate %in% iso.index.keep,]
+exp.col0.100 <- exp.col0.100[,-c(1:2)]
+
+exp.npr1.100 <- exp.100[exp.100$HostGenotype == "npr.1",]
+exp.npr1.100 <- exp.npr1.100[exp.npr1.100$Isolate %in% iso.index.keep,]
+exp.npr1.100 <- exp.npr1.100[,-c(1:2)]
+
+####################
+
 # Running BigRR
 
 #for each of the phenotype conditions (expression data for a gene), 
@@ -150,29 +177,40 @@ coi.output.HEM <- snps.all[,c(1,2)]
 
 strt <- 1
 
-write.table(t(snps.all[,c(1,2)]), file="coi_BLUP_results_appendTest.csv", sep=",",
-            quote=FALSE, row.names = TRUE, col.names = FALSE, append =TRUE)
-write.table(t(snps.all[,c(1,2)]), file="coi_HEM_results.csv", sep=",", 
-            quote = FALSE, row.names =TRUE, col.names=FALSE, append=TRUE)
+date <- "11282016"
+
+outfile.blup <- paste(paste("coi_BLUP_results", date, sep="_"), ".csv", sep="")
+outfile.hem <- paste(paste("coi_HEM_results", date, sep="_"), ".csv", sep="")
+
+write.table(t(snps.all[,c(1,2)]), file=outfile.blup, sep=",",
+            quote=FALSE, row.names = TRUE, col.names = FALSE, append =FALSE)
+write.table(t(snps.all[,c(1,2)]), file=outfile.hem, sep=",", 
+            quote = FALSE, row.names =TRUE, col.names=FALSE, append=FALSE)
 
 #do gwas analysis in chunks, to not fill the R memory environment
-for (p in 1:18) {
+#loop through this twise
+for (p in 1:2) {
   print(p)
   #iterate through the trait data in chunks of 500
   # the reason for this is, the first time we ran it, it maxed out the memory after 705
   # iterations. I want to stay well below that.
   #This is not going to get all of the Botrytis genes. There are 9267. We'll have to add
   # the 267 genes later because I don't know how to to iteratively set an odd number in this chunk fashion.
-  stp <- p*500
+  stp <- p*50
   #stp <- (p*10)/2
   print(stp)
   #create numberic vector for columns for the chunk
   chunk <- c(strt:stp)
+  print("Here's your chunk")
   print(chunk)
   
   #subset the larger expression data set by that chunk
-  exp.chunk <- exp.coi.1[,chunk]
+  exp.chunk <- exp.coi1.100[,chunk]
+  print("Chunk dimensions")
   print(dim(exp.chunk))
+  
+  print("Names of the genes in this chunk:")
+  print(colnames(exp.chunk))
  
   #create lists to store the output
   chunk.list.BLUP <- list()
@@ -251,21 +289,18 @@ for (p in 1:18) {
   dim(BLUP.results.df)
   
   #and append to a file
-  write.table(t(BLUP.results.df), file="coi_BLUP_results_appendTest.csv", sep=",",
+  write.table(t(BLUP.results.df), file=outfile.blup, sep=",",
               quote=FALSE, row.names = TRUE, col.names = FALSE, append =TRUE)
-  write.table(t(HEM.results.df), file="coi_HEM_results_appendTest.csv", sep=",", 
+  write.table(t(HEM.results.df), file=outfile.hem, sep=",", 
               quote=FALSE, row.names = TRUE, col.names = FALSE, append =TRUE)
   
   #update start
   strt <- stp+1
-  print(strt)
+  #print(strt)
 }
 
-list.test.blup <- read.table("coi_BLUP_results_appendTest.csv", sep=",")
+list.test.blup <- read.table(outfile.blup, sep=",")
 
-list.test.hem <- read.table("coi_HEM_results_appendTest.csv")
-
-write.table(coi.output.BLUP, file="coi_BLUP_results.csv", sep=",", quote = FALSE, row.names = FALSE)
-write.table(coi.output.HEM, file="coi_HEM_results.csv", sep=",", quote = FALSE, row.names =FALSE)
+list.test.hem <- read.table(outfile.hem)
 
 sink()
