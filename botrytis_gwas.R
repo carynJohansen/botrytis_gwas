@@ -6,8 +6,12 @@
 ##########
 # Set Up
 
+#CHANGE THIS ALWAYS
+
+date <- "12052016"
+
 setwd("~/Dropbox/UCD/rotations/Kliebenstein/botrytis_gwas")
-sink("bot_bigRR_allSNPS_11292016.txt")
+sink(paste(paste("bot_bigRR_500SNPS", date, sep="_"), ".txt", sep=""))
 library(bigRR)
 
 data.path <- "~/Box Sync/Botrytis_DKrotation/data/"
@@ -125,39 +129,35 @@ bigRR_update_function <- function(blup.result, shrink.param.design) {
 
 #Random Sample of genes
 
-#random.genes <- sample(3:length(exp.coi.1), 500, replace=FALSE)
+#random.traits <- sample(3:length(exp.coi.1), 500, replace=FALSE)
 #add one and two
-#random.genes <- c(1,2,random.genes)
+#random.traits <- c(1,2,random.traits)
 #order it?
-#random.genes <- random.genes[order(random.genes)]
-#print(random.genes)
+#random.traits <- random.traits[order(random.traits)]
+#print(random.traits)
 
-random.genes <-  c(1,2,7,16,36,48,52,84,96,113,115,130,156,171,236,263,277,279,298,319,321,
-                   325,333,354,375,376,389,417,439,446,459,463,470,476,494,501,516,542,596,618,633,636,
-                   737,757,764,779,785,801,837,869,885,928,932,936,939,1006,1030,1056,1063,1087,1089,1094,1111,
-                   1119,1133,1142,1143,1178,1180,1188,1191,1215,1234,1270,1271,1278,1288,1330,1337,1351,1382,1390,1401,1436,
-                   1490,1492,1523,1529,1559,1610,1623,1668,1687,1689,1720,1732,1733,1749,1755,1766,1767,1768,1796,1799,1839,
-                   1861,1875,1882,1891,1907,1929,1944,1961,1973,2051,2067,2072,2076,2095,2096,2100,2102,2138,2176,2177,2204,
-                   2265,2290,2291,2315,2321,2336,2356,2412,2453,2462,2471,2490,2492,2503,2553,2561,2571,2580,2587,2603,2604,
-                   2648,2704,2706,2710,2711,2737,2764,2780,2852,2873,2888,2907,2917,2965,2966,2992,3008,3040,3055,3101,3123,
-                   3133,3136,3137,3142,3146,3180,3193,3204,3273,3276,3284,3287,3308,3331,3333,3341,3343,3348,3353,3371,3381,
-                   3383,3412,3442,3449,3458,3503,3506,3526,3532,3571,3608,3627,3676,3680,3682,3755,3763,3772,3792,3848,3883,
-                   3885,3901,3921,3971,3998,4007,4010,4028,4038,4059,4083,4108,4121,4135,4137,4145,4168,4213,4214,4272,4275,
-                   4299,4316,4319,4322,4340,4366,4412,4426,4450,4478,4495,4506,4551,4556,4566,4590,4601,4650,4705,4745,4771,
-                   4798,4809,4822,4823,4828,4829,4834,4845,4846,4853,4891,4901,4911,4972,4985,4988,4993,5069,5070,5101,5110,
-                   5140,5153,5162,5187,5204,5224,5247,5275,5280,5307,5313,5337,5340,5353,5359,5365,5386,5429,5435,5441,5448,
-                   5455,5459,5461,5463,5464,5476,5477,5488,5489,5494,5501,5510,5523,5545,5556,5557,5560,5571,5582,5620,5632,
-                   5644,5668,5707,5745,5795,5807,5839,5899,5909,5917,5939,5969,5970,5972,5976,5977,5983,5986,5994,6034,6059,
-                   6068,6072,6109,6137,6168,6177,6195,6212,6219,6224,6227,6249,6253,6256,6259,6288,6303,6313,6314,6373,6392,
-                   6481,6492,6513,6584,6631,6677,6701,6708,6721,6737,6755,6759,6778,6781,6795,6798,6816,6944,6950,6960,6966,
-                   6972,6978,6992,7000,7001,7029,7043,7046,7050,7072,7094,7100,7101,7146,7193,7209,7219,7238,7298,7323,7350,
-                   7361,7371,7382,7402,7412,7414,7443,7460,7462,7512,7513,7515,7544,7599,7606,7638,7644,7669,7683,7720,7722,
-                   7757,7758,7766,7767,7775,7794,7810,7825,7835,7841,7891,7898,7914,7938,7973,7999,8020,8026,8071,8076,8109,
-                   8121,8138,8147,8161,8202,8212,8215,8261,8283,8304,8313,8345,8347,8356,8370,8372,8383,8401,8410,8424,8436,
-                   8476,8478,8487,8500,8523,8531,8568,8573,8605,8635,8665,8688,8729,8737,8746,8749,8775,8784,8787,8790,8805,
-                   8833,8849,8850,8858,8863,8918,8937,8942,8943,8944,8964,8969,8977,9066,9076,9079,9164,9165,9175)
+random.traits <- c(1,2,4269,5891,5016,7628,8213,7061,4977,8042,2093,5864,6050,6114,1273,6777,670,2644,4174,4280,1253,1257,6652,2310,4083,1202,2050,
+                   8355,8758,3775,4216,356,8521,2034,4201,6080,3426,2218,5960,2181,7831,3316,9196,3416,1387,5000,3941,2132,7925,119,5842,9233,
+                   3924,6295,888,6954,3596,5292,3931,309,4305,2249,8715,466,2965,55,530,629,6351,777,4190,2804,3854,4611,6782,490,17,
+                   4333,2665,554,4035,4956,6684,7796,3647,6493,1446,7859,5925,4809,4661,3302,4993,2040,8040,960,2696,6974,971,6368,920,8686,
+                   1402,3670,758,6027,4402,152,8840,1585,4217,5138,7157,1900,1237,2583,3774,1916,6537,5239,3306,5002,7170,6556,6916,8163,2409,
+                   4236,2012,1290,9056,5890,3871,7386,4592,4562,4368,7896,2602,4505,1616,7897,1169,1091,7480,1903,1479,7874,6821,8576,8392,1456,
+                   7992,6520,4055,3001,2687,4267,1279,8699,4488,9120,3716,2009,5118,4004,2485,4737,6693,1391,6938,1277,7815,3818,8984,2419,5260,
+                   2015,2568,2201,4265,1256,471,4633,5013,4328,3045,3174,5972,2365,3578,5876,760,941,4670,6532,799,9256,7395,2559,306,231,
+                   4023,4158,6133,396,583,5870,8328,5868,1703,1373,2775,4534,5115,2421,3332,4750,1359,2112,5962,926,2715,2707,6275,5105,2776,
+                   9124,1530,5843,4179,4753,6706,5423,5383,8289,9209,3946,233,6206,8367,6978,4370,3081,1749,1401,3791,8248,5441,3465,582,6384,
+                   6884,5738,5387,6985,7981,6500,7551,1959,2661,8656,2810,469,1439,3389,3231,5092,7449,6408,8671,5969,7409,2131,303,4658,7145,
+                   5084,7643,9130,6576,7765,1765,7189,7696,4099,6892,4140,6702,713,3156,4336,7193,1995,4887,3736,4245,5034,8357,2314,6956,269,
+                   19,5803,3002,3229,614,1404,6470,897,2948,8423,7312,5992,6090,4814,4556,980,4172,7710,3213,8421,5181,5788,1198,2422,6703,
+                   7171,3101,5832,2043,8970,3327,9243,8664,8330,352,5826,3248,2929,4844,532,2638,1428,3039,2571,5791,448,5246,742,2232,6768,
+                   6374,4790,5093,1113,6719,6084,822,162,1972,8818,3773,8323,7403,8162,2657,6853,1343,2848,6941,6867,6043,3482,8952,4495,8713,
+                   6468,8296,4634,733,9219,8748,7007,373,1426,4803,2704,1127,2301,3136,1476,3228,1800,5562,7631,1158,9018,26,6049,4097,7243,
+                   2019,4722,5173,6855,1756,3947,6964,7674,4533,7952,6438,973,1416,4127,3686,5408,5617,2125,4110,5518,8413,8395,220,2126,6856,
+                   813,4472,998,7318,7667,4071,1427,28,6966,5856,5643,3653,6579,1424,9087,2258,1229,4609,2580,8761,2439,5069,5403,1443,4535,
+                   8566,3441,2914,7592,1793,6813,936,5280,2205,4863,8574,5950,7200,7227,6773,7833,4914,2387,5381,3683,6353,7127,5150,8004,4939,
+                   7779,7296,4465,3816,8230,5278,2647,1623,288,8286,4732,8063,5430,308,689,3637,398,6220,4434,6013,6506,6812,7019,2876,5409)
 
-exp.500 <- expression.y[,random.genes]
+exp.500 <- expression.y[,random.traits]
 print("Length of Colnames of exp.500 data frame")
 print(length(colnames(exp.500)))
 
@@ -178,6 +178,56 @@ exp.npr1.500 <- exp.npr1.500[,-c(1:2)]
 
 ####################
 
+#Z-score expression
+
+#Coi
+z.score.list <- list()
+
+for (j in 1:length(exp.coi1.500)) {
+  gene <- colnames(exp.coi1.500)[j]
+  mu <- mean(exp.coi1.500[,j])
+  stddev <- sd(x = exp.coi1.500[,j])
+  
+  z.vector <- as.matrix((exp.coi1.500[,j] - mu)/stddev)
+  z.score.list[[j]] <- z.vector
+  colnames(z.score.list[[j]]) <- colnames(exp.coi1.500)[j]
+}
+
+z.coi1.500 <- as.data.frame(do.call(cbind, z.score.list))
+
+#Col
+z.score.list <- list()
+
+for (j in 1:length(exp.col0.500)) {
+  gene <- colnames(exp.col0.500)[j]
+  mu <- mean(exp.col0.500[,j])
+  stddev <- sd(x = exp.col0.500[,j])
+  
+  z.vector <- as.matrix((exp.col0.500[,j] - mu)/stddev)
+  z.score.list[[j]] <- z.vector
+  colnames(z.score.list[[j]]) <- colnames(exp.col0.500)[j]
+}
+
+z.col0.500 <- as.data.frame(do.call(cbind, z.score.list))
+
+#npr
+z.score.list <- list()
+
+for (j in 1:length(exp.npr1.500)) {
+  gene <- colnames(exp.npr1.500)[j]
+  mu <- mean(exp.npr1.500[,j])
+  stddev <- sd(x = exp.npr1.500[,j])
+  
+  z.vector <- as.matrix((exp.npr1.500[,j] - mu)/stddev)
+  z.score.list[[j]] <- z.vector
+  colnames(z.score.list[[j]]) <- colnames(exp.npr1.500)[j]
+}
+
+z.npr1.500 <- as.data.frame(do.call(cbind, z.score.list))
+
+
+####################
+
 # Running BigRR
 
 #for each of the phenotype conditions (expression data for a gene), 
@@ -191,24 +241,13 @@ dim(snp.Z.mat)
 
 ###################
 #Coi.1
-  
-#snps.chrom1 <- snps.all[snps.all$CHROM.GROUP == 1,]
-#snps.chrom1 <- snps.chrom1[,-96]
-
-#coi.output.BLUP <- snps.all[,c(1,2)]
-#coi.output.HEM <- snps.all[,c(1,2)]
-
-#snps.chrom1.mat <- as.matrix(snps.chrom1[,-c(1:3)])
-#dim(snps.chrom1.mat)
 
 #outdir <- "~/Botrytis"
 
 strt <- 1
 
-date <- "11292016"
-
-outfile.blup <- paste(paste("coi_BLUP_results", date, sep="_"), ".csv", sep="")
-outfile.hem <- paste(paste("coi_HEM_results", date, sep="_"), ".csv", sep="")
+outfile.blup <- paste(paste("coi1_BLUP_results", date, sep="_"), ".csv", sep="")
+outfile.hem <- paste(paste("coi1_HEM_results", date, sep="_"), ".csv", sep="")
 
 write.table(t(snps.all[,c(1,2)]), file=outfile.blup, sep=",",
             quote=FALSE, row.names = TRUE, col.names = FALSE, append =FALSE)
@@ -216,15 +255,16 @@ write.table(t(snps.all[,c(1,2)]), file=outfile.hem, sep=",",
             quote = FALSE, row.names =TRUE, col.names=FALSE, append=FALSE)
 
 #do gwas analysis in chunks, to not fill the R memory environment
-#loop through this twise
 for (p in 1:10) {
   print(paste("This is outer iteration:", p, sep=" "))
-  #iterate through the trait data in chunks of 100
+  #iterate through the trait data in chunks of 500
   # the reason for this is, the first time we ran it, it maxed out the memory after 705
   # iterations. I want to stay well below that.
- 
+  #This is not going to get all of the Botrytis genes. There are 9267. We'll have to add
+  # the 267 genes later because I don't know how to to iteratively set an odd number in this chunk fashion.
   stp <- p*50
-
+  
+  print(stp)
   #create numberic vector for columns for the chunk
   chunk <- c(strt:stp)
   print("Here's your chunk:")
@@ -235,9 +275,6 @@ for (p in 1:10) {
   print("Chunk dimensions")
   print(dim(exp.chunk))
   
-  print("Names of the genes in this chunk:")
-  print(colnames(exp.chunk))
- 
   #create lists to store the output
   chunk.list.BLUP <- list()
   chunk.list.HEM <- list()
@@ -257,6 +294,7 @@ for (p in 1:10) {
     
     #fit the ridge regression
     BLUP.result <- try(bigRR_function(exp.chunk[,j], j.X, t(snp.Z.mat)), TRUE)
+    
     if (class(BLUP.result) == "try-error") {
       print(paste(colnames(exp.chunk)[j], "at j =", j, "encountered an error in bigRR() and was skipped"))
       print("ERROR MESSAGE:")
@@ -292,7 +330,7 @@ for (p in 1:10) {
       chunk.list.BLUP[[gene]] <- BLUP.result$u
       colnames(chunk.list.BLUP[[gene]]) <- gene
       #add the filler for the gene
-      chunk.list.HEM[[gene]] <- as.matrix(rep(9999, nrow(coi.output.HEM)))
+      chunk.list.HEM[[gene]] <- as.matrix(rep(9999,nrow(snp.Z.mat)))
       colnames(chunk.list.HEM[[gene]]) <- paste(gene, "FAIL", sep="_")
       
       #go to next iteration
@@ -321,11 +359,263 @@ for (p in 1:10) {
   
   #update start
   strt <- stp+1
-  #print(strt)
+  print(strt)
 }
 
-#list.test.blup <- read.table(outfile.blup, sep=",")
+#checking execution time
+proc.time() -timing
 
-#list.test.hem <- read.table(outfile.hem)
+###################
+#Col0
+
+#outdir <- "~/Botrytis"
+
+strt <- 1
+
+outfile.blup <- paste(paste("col0_BLUP_results", date, sep="_"), ".csv", sep="")
+outfile.hem <- paste(paste("col0_HEM_results", date, sep="_"), ".csv", sep="")
+
+write.table(t(snps.all[,c(1,2)]), file=outfile.blup, sep=",",
+            quote=FALSE, row.names = TRUE, col.names = FALSE, append =FALSE)
+write.table(t(snps.all[,c(1,2)]), file=outfile.hem, sep=",", 
+            quote = FALSE, row.names =TRUE, col.names=FALSE, append=FALSE)
+
+#do gwas analysis in chunks, to not fill the R memory environment
+for (p in 1:10) {
+  print(paste("This is outer iteration:", p, sep=" "))
+  #iterate through the trait data in chunks of 500
+  # the reason for this is, the first time we ran it, it maxed out the memory after 705
+  # iterations. I want to stay well below that.
+  #This is not going to get all of the Botrytis genes. There are 9267. We'll have to add
+  # the 267 genes later because I don't know how to to iteratively set an odd number in this chunk fashion.
+  stp <- p*50
+  
+  print(stp)
+  #create numberic vector for columns for the chunk
+  chunk <- c(strt:stp)
+  print("Here's your chunk:")
+  print(chunk)
+  
+  #subset the larger expression data set by that chunk
+  exp.chunk <- exp.col0.500[,chunk]
+  print("Chunk dimensions")
+  print(dim(exp.chunk))
+  
+  #create lists to store the output
+  chunk.list.BLUP <- list()
+  chunk.list.HEM <- list()
+  
+  #loop through expression subset by the genes and run bigRR
+  for (j in 1:dim(exp.chunk)[2]) {
+    #j is the expression data for each gene across all tested conditions
+    print(j)
+    print(colnames(exp.chunk)[j])
+    gene <- colnames(exp.chunk)[j]
+    print(paste("The trait here is:", gene, sep=" "))
+    #print the variance
+    print(paste("Expression variance:", var(exp.chunk[,j])), sep=" ")
+    
+    #make the design matrix
+    j.X <- matrix(1, dim(exp.chunk)[1], 1)
+    
+    #fit the ridge regression
+    BLUP.result <- try(bigRR_function(exp.chunk[,j], j.X, t(snp.Z.mat)), TRUE)
+    
+    if (class(BLUP.result) == "try-error") {
+      print(paste(colnames(exp.chunk)[j], "at j =", j, "encountered an error in bigRR() and was skipped"))
+      print("ERROR MESSAGE:")
+      print(BLUP.result)
+      
+      #add to chunk list
+      chunk.list.BLUP[[gene]] <- as.matrix(rep(9999, nrow(snp.Z.mat)))
+      colnames(chunk.list.BLUP[[gene]]) <- paste(gene, "FAIL", sep="_")
+      chunk.list.HEM[[gene]] <- as.matrix(rep(9999, nrow(snp.Z.mat)))
+      colnames(chunk.list.HEM[[gene]]) <- paste(gene, "FAIL", sep="_")
+      
+      #go to next iteration
+      next
+    }
+    
+    #BLUP.result <- bigRR(y = exp.chunk[,j], X=j.X, Z=t(snps.chrom1.mat), 
+    #                     family = gaussian(link="identity"), #poisson for RNA expression data
+    #                     tol.err = 1e-06,
+    #                     tol.conv = 1e-08,
+    #                     GPU = FALSE)
+    #updates the obtained bigRR object into a new object with heteroscedastic assumptions
+    #meaning that the variability of a variable is unequal acress the range of values of the variable
+    # that is being used to predict it. (here, the variability of expression 
+    # data for a gene would be unequal across the SNP values)
+    HEM.result <- try(bigRR_update(BLUP.result, t(snp.Z.mat)), TRUE)
+    if (class(HEM.result) == "try-error") {
+      print(paste(colnames(exp.chunk)[j], "at j =", j, "encountered an error in bigRR_update() and was skipped"))
+      print("ERROR MESSAGE:")
+      print(HEM.result)
+      
+      #add to chunk list
+      #add the BLUP result, which was not an error at this point
+      chunk.list.BLUP[[gene]] <- BLUP.result$u
+      colnames(chunk.list.BLUP[[gene]]) <- gene
+      #add the filler for the gene
+      chunk.list.HEM[[gene]] <- as.matrix(rep(9999,nrow(snp.Z.mat)))
+      colnames(chunk.list.HEM[[gene]]) <- paste(gene, "FAIL", sep="_")
+      
+      #go to next iteration
+      next
+    }
+    
+    #if it makes it through bigRR() and bigRR_update() without any error, store the data
+    chunk.list.BLUP[[gene]] <- BLUP.result$u
+    colnames(chunk.list.BLUP[[gene]]) <- gene
+    chunk.list.HEM[[gene]] <- HEM.result$u
+    colnames(chunk.list.HEM[[gene]]) <- gene
+  }
+  
+  #After the loop, form list into data frame
+  BLUP.results.df <- do.call(cbind, chunk.list.BLUP)
+  dim(BLUP.results.df)
+  
+  HEM.results.df <- do.call(cbind, chunk.list.HEM)
+  dim(BLUP.results.df)
+  
+  #and append to a file
+  write.table(t(BLUP.results.df), file=outfile.blup, sep=",",
+              quote=FALSE, row.names = TRUE, col.names = FALSE, append =TRUE)
+  write.table(t(HEM.results.df), file=outfile.hem, sep=",", 
+              quote=FALSE, row.names = TRUE, col.names = FALSE, append =TRUE)
+  
+  #update start
+  strt <- stp+1
+  print(strt)
+}
+
+#checking execution time
+proc.time() -timing
+
+###################
+#npr1
+
+#outdir <- "~/Botrytis"
+
+strt <- 1
+
+outfile.blup <- paste(paste("npr1_BLUP_results", date, sep="_"), ".csv", sep="")
+outfile.hem <- paste(paste("npr1_HEM_results", date, sep="_"), ".csv", sep="")
+
+write.table(t(snps.all[,c(1,2)]), file=outfile.blup, sep=",",
+            quote=FALSE, row.names = TRUE, col.names = FALSE, append =FALSE)
+write.table(t(snps.all[,c(1,2)]), file=outfile.hem, sep=",", 
+            quote = FALSE, row.names =TRUE, col.names=FALSE, append=FALSE)
+
+#do gwas analysis in chunks, to not fill the R memory environment
+for (p in 1:10) {
+  print(paste("This is outer iteration:", p, sep=" "))
+  #iterate through the trait data in chunks of 500
+  # the reason for this is, the first time we ran it, it maxed out the memory after 705
+  # iterations. I want to stay well below that.
+  #This is not going to get all of the Botrytis genes. There are 9267. We'll have to add
+  # the 267 genes later because I don't know how to to iteratively set an odd number in this chunk fashion.
+  stp <- p*50
+  
+  print(stp)
+  #create numberic vector for columns for the chunk
+  chunk <- c(strt:stp)
+  print("Here's your chunk:")
+  print(chunk)
+  
+  #subset the larger expression data set by that chunk
+  exp.chunk <- exp.npr1.500[,chunk]
+  print("Chunk dimensions")
+  print(dim(exp.chunk))
+  
+  #create lists to store the output
+  chunk.list.BLUP <- list()
+  chunk.list.HEM <- list()
+  
+  #loop through expression subset by the genes and run bigRR
+  for (j in 1:dim(exp.chunk)[2]) {
+    #j is the expression data for each gene across all tested conditions
+    print(j)
+    print(colnames(exp.chunk)[j])
+    gene <- colnames(exp.chunk)[j]
+    print(paste("The trait here is:", gene, sep=" "))
+    #print the variance
+    print(paste("Expression variance:", var(exp.chunk[,j])), sep=" ")
+    
+    #make the design matrix
+    j.X <- matrix(1, dim(exp.chunk)[1], 1)
+    
+    #fit the ridge regression
+    BLUP.result <- try(bigRR_function(exp.chunk[,j], j.X, t(snp.Z.mat)), TRUE)
+    
+    if (class(BLUP.result) == "try-error") {
+      print(paste(colnames(exp.chunk)[j], "at j =", j, "encountered an error in bigRR() and was skipped"))
+      print("ERROR MESSAGE:")
+      print(BLUP.result)
+      
+      #add to chunk list
+      chunk.list.BLUP[[gene]] <- as.matrix(rep(9999, nrow(snp.Z.mat)))
+      colnames(chunk.list.BLUP[[gene]]) <- paste(gene, "FAIL", sep="_")
+      chunk.list.HEM[[gene]] <- as.matrix(rep(9999, nrow(snp.Z.mat)))
+      colnames(chunk.list.HEM[[gene]]) <- paste(gene, "FAIL", sep="_")
+      
+      #go to next iteration
+      next
+    }
+    
+    #BLUP.result <- bigRR(y = exp.chunk[,j], X=j.X, Z=t(snps.chrom1.mat), 
+    #                     family = gaussian(link="identity"), #poisson for RNA expression data
+    #                     tol.err = 1e-06,
+    #                     tol.conv = 1e-08,
+    #                     GPU = FALSE)
+    #updates the obtained bigRR object into a new object with heteroscedastic assumptions
+    #meaning that the variability of a variable is unequal acress the range of values of the variable
+    # that is being used to predict it. (here, the variability of expression 
+    # data for a gene would be unequal across the SNP values)
+    HEM.result <- try(bigRR_update(BLUP.result, t(snp.Z.mat)), TRUE)
+    if (class(HEM.result) == "try-error") {
+      print(paste(colnames(exp.chunk)[j], "at j =", j, "encountered an error in bigRR_update() and was skipped"))
+      print("ERROR MESSAGE:")
+      print(HEM.result)
+      
+      #add to chunk list
+      #add the BLUP result, which was not an error at this point
+      chunk.list.BLUP[[gene]] <- BLUP.result$u
+      colnames(chunk.list.BLUP[[gene]]) <- gene
+      #add the filler for the gene
+      chunk.list.HEM[[gene]] <- as.matrix(rep(9999, nrow(snp.Z.mat)))
+      colnames(chunk.list.HEM[[gene]]) <- paste(gene, "FAIL", sep="_")
+      
+      #go to next iteration
+      next
+    }
+    
+    #if it makes it through bigRR() and bigRR_update() without any error, store the data
+    chunk.list.BLUP[[gene]] <- BLUP.result$u
+    colnames(chunk.list.BLUP[[gene]]) <- gene
+    chunk.list.HEM[[gene]] <- HEM.result$u
+    colnames(chunk.list.HEM[[gene]]) <- gene
+  }
+  
+  #After the loop, form list into data frame
+  BLUP.results.df <- do.call(cbind, chunk.list.BLUP)
+  dim(BLUP.results.df)
+  
+  HEM.results.df <- do.call(cbind, chunk.list.HEM)
+  dim(BLUP.results.df)
+  
+  #and append to a file
+  write.table(t(BLUP.results.df), file=outfile.blup, sep=",",
+              quote=FALSE, row.names = TRUE, col.names = FALSE, append =TRUE)
+  write.table(t(HEM.results.df), file=outfile.hem, sep=",", 
+              quote=FALSE, row.names = TRUE, col.names = FALSE, append =TRUE)
+  
+  #update start
+  strt <- stp+1
+  print(strt)
+}
+
+#checking execution time
+proc.time() -timing
+
 
 sink()
